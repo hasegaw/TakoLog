@@ -13,12 +13,12 @@ import (
 	"github.com/hasegaw/TakoLog/src/utils"
 )
 
-func process_video() {
-	win_matched := gocv.NewWindow("Matched")
-	win_scoreboard := gocv.NewWindow("Scoreboard")
+func processVideo() {
+	winMatched := gocv.NewWindow("Matched")
+	winScoreboard := gocv.NewWindow("Scoreboard")
 
 	img1 := utils.IMRead720p("result.jpg")
-	feature1 := scoreboard.Extract_feature(img1)
+	feature1 := scoreboard.ExtractFeature(img1)
 
 	var webcam *gocv.VideoCapture
 	var err error
@@ -30,7 +30,7 @@ func process_video() {
 
 	fmt.Println(err)
 	img := gocv.NewMat()
-	img_720p := gocv.NewMatWithSize(1280, 720, gocv.MatTypeCV8UC3)
+	img720p := gocv.NewMatWithSize(1280, 720, gocv.MatTypeCV8UC3)
 	for {
 		for i := 0; i < 10; i++ {
 			webcam.Read(&img)
@@ -39,18 +39,18 @@ func process_video() {
 		//     break
 		// }
 
-		gocv.Resize(img, &img_720p, image.Point{1280, 720}, 0.0, 0.0, gocv.InterpolationLinear)
-		if scoreboard.Match_result(img_720p, feature1) {
+		gocv.Resize(img, &img720p, image.Point{1280, 720}, 0.0, 0.0, gocv.InterpolationLinear)
+		if scoreboard.MatchResult(img720p, feature1) {
 			fmt.Println("Found scoreboard")
-			win_scoreboard.IMShow(img_720p)
-			win_scoreboard.WaitKey(1)
+			winScoreboard.IMShow(img720p)
+			winScoreboard.WaitKey(1)
 			return
 		}
 
-		if lobby.Match_result(img_720p) {
+		if lobby.MatchResult(img720p) {
 			fmt.Println("Found lobby_matched")
-			win_matched.IMShow(img_720p)
-			win_matched.WaitKey(0)
+			winMatched.IMShow(img720p)
+			winMatched.WaitKey(0)
 		}
 	}
 }
@@ -62,5 +62,5 @@ func main() {
 		log.Fatal("")
 	}
 
-	process_video()
+	processVideo()
 }
