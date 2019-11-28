@@ -8,9 +8,9 @@ import (
     "gocv.io/x/gocv"
     "image"
 
-    "utils"
-    "scenes/result/scoreboard"
-    "scenes/lobby"
+    "github.com/hasegaw/TakoLog/src/utils"
+    "github.com/hasegaw/TakoLog/src/scenes/result/scoreboard"
+    "github.com/hasegaw/TakoLog/src/scenes/lobby"
 )
 
 

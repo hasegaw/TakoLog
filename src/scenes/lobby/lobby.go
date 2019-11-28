@@ -6,7 +6,7 @@ import (
     "image"
     "image/color"
 
-    "utils"
+    "github.com/hasegaw/TakoLog/src/utils"
 )
 
 var feat_matched gocv.Mat
