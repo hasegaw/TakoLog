@@ -1,64 +1,61 @@
 package lobby
 
 import (
-//    "fmt"
-    "gocv.io/x/gocv"
-    "image"
-    "image/color"
+	// "fmt"
+	"gocv.io/x/gocv"
+	"image"
+	"image/color"
 
-    "utils"
+	"github.com/hasegaw/TakoLog/src/utils"
 )
 
-var feat_matched gocv.Mat
+var featMatched gocv.Mat
 var done = false
 
+func ExtractFeature(img gocv.Mat) gocv.Mat {
+	imgWinBGR := img.Region(image.Rect(848, 32, 848+200, 32+32))
+	imgWinHSV := imgWinBGR.Clone() // gocv.NewMatWithSize(80, 32, gocv.MatTypeCV8UC3)
+	imgWinV := gocv.NewMatWithSize(80, 32, gocv.MatTypeCV8UC1)
+	imgWinVNorm := gocv.NewMatWithSize(80, 32, gocv.MatTypeCV8UC1)
+    gocv.CvtColor(imgWinBGR, &imgWinHSV, gocv.ColorBGRToHSV)
+	gocv.ExtractChannel(imgWinHSV, &imgWinV, 2)
+	gocv.Normalize(imgWinV, &imgWinVNorm, 0.0, 255.0, gocv.NormMinMax)
 
-func Extract_feature(img gocv.Mat) gocv.Mat {
-    img_win_bgr := img.Region(image.Rect(848, 32, 848+200, 32+32))
-    img_win_hsv := img_win_bgr.Clone() // gocv.NewMatWithSize(80, 32, gocv.MatTypeCV8UC3)
-    img_win_v   := gocv.NewMatWithSize(80, 32, gocv.MatTypeCV8UC1)
-    img_win_v_norm := gocv.NewMatWithSize(80, 32, gocv.MatTypeCV8UC1)
-    gocv.CvtColor(img_win_bgr, &img_win_hsv, gocv.ColorBGRToHSV)
-    gocv.ExtractChannel(img_win_hsv, &img_win_v, 2)
-    gocv.Normalize(img_win_v, &img_win_v_norm, 0.0, 255.0, gocv.NormMinMax)
-
-    return img_win_v_norm
+	return imgWinVNorm
 }
 
-func Match_result(img gocv.Mat) bool {
-    if done {
-        return false
-    }
+func MatchResult(img gocv.Mat) bool {
+	if done {
+		return false
+	}
 
-    img1 := img
-    feature1 := Extract_feature(img1)
-    feature2 := feat_matched
+	img1 := img
+	feature1 := ExtractFeature(img1)
+	feature2 := featMatched
 
-    result := gocv.NewMatWithSize(1, 1, gocv.MatTypeCV32F)
-    mask_1 := gocv.NewMatWithSize(feature1.Rows(), feature1.Cols(), gocv.MatTypeCV32F)
-    /*
-    fmt.Println(feature1.Cols())
-    fmt.Println(feature1.Rows())
-    fmt.Println(feature1.Channels())
-    fmt.Println(feature2.Cols())
-    fmt.Println(feature2.Rows())
-    fmt.Println(feature2.Channels())
-    fmt.Println(mask_1.Cols())
-    fmt.Println(mask_1.Rows())
-    fmt.Println(mask_1.Channels())
-*/
-    gocv.Rectangle(&mask_1, image.Rect(0, 0, mask_1.Cols(), mask_1.Rows()), color.RGBA{255, 255, 255,0}, -1)
+	result := gocv.NewMatWithSize(1, 1, gocv.MatTypeCV32F)
+	mask1 := gocv.NewMatWithSize(feature1.Rows(), feature1.Cols(), gocv.MatTypeCV32F)
+	// fmt.Println(feature1.Cols())
+	// fmt.Println(feature1.Rows())
+	// fmt.Println(feature1.Channels())
+	// fmt.Println(feature2.Cols())
+	// fmt.Println(feature2.Rows())
+	// fmt.Println(feature2.Channels())
+	// fmt.Println(mask1.Cols())
+	// fmt.Println(mask1.Rows())
+	// fmt.Println(mask1.Channels())
+	gocv.Rectangle(&mask1, image.Rect(0, 0, mask1.Cols(), mask1.Rows()), color.RGBA{255, 255, 255, 0}, -1)
 
-    gocv.MatchTemplate(feature1, feature2, &result, gocv.TmSqdiff, mask_1)
-    //fmt.Print("lobby_matched: ")
-    //fmt.Print(result.GetFloatAt(0, 0))
+	gocv.MatchTemplate(feature1, feature2, &result, gocv.TmSqdiff, mask1)
+	// fmt.Print("lobby_matched: ")
+	// fmt.Print(result.GetFloatAt(0, 0))
 
-    done = true
+	done = true
 
-    return result.GetFloatAt(0, 0) < 100.0
+	return result.GetFloatAt(0, 0) < 100.0
 }
 
 func init() {
-    img := utils.IMRead720p("masks/spl2_lobby_matched.png")
-    feat_matched = Extract_feature(img)
+	img := utils.IMRead720p("masks/spl2_lobby_matched.png")
+	featMatched = ExtractFeature(img)
 }

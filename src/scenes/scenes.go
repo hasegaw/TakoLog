@@ -1,5 +1,5 @@
 package scenes
 
 import (
-    "./result/scoreboard"
+	"./result/scoreboard"
 )
